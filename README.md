@@ -21,7 +21,7 @@ python app.py
 ```
 3. Access the site at `http://localhost:8000`
 
-[alt text](<Screenshot 2026-03-02 at 4.35.07 AM.png>)
+![alt text](<Screenshot 2026-03-02 at 4.35.07 AM.png>)
 
 ## EC2 Deployment
 
@@ -69,8 +69,6 @@ python3 app.py
 6. Access the site at `http://100.52.168.5:8000`
 
 
-![Flask on port :8000](./ash-web/images/using_flask_on_8000.jpg)
-
 ### Use Nginx as reverse proxy server (Production grade)
 
 1. Copy nginx config:
@@ -109,7 +107,7 @@ sudo systemctl start nginx
 
 4. Access the site at `http://umarfkporfolio.website`
 
-![Nginx without SSL:](./ash-web/images/using_nginx_without_ssl.jpg)
+![Nginx without SSL:] ![alt text](<Screenshot 2026-03-02 at 6.11.40 AM-1.png>)
 
 ### Security Group Configuration
 
@@ -160,7 +158,7 @@ sudo systemctl restart nginx
 
 4. Get SSL Certificate (Certbot will automatically configure Nginx):
 ```bash
-sudo certbot --nginx -d umarfkporfolio.website -d www.umarfkporfolio.website
+sudo certbot --nginx -d umarfkporfolio.website
 ```
 
 5. Follow the prompts to enter your email and agree to terms.
@@ -172,4 +170,48 @@ sudo certbot --nginx -d umarfkporfolio.website -d www.umarfkporfolio.website
 sudo certbot renew --dry-run
 ```
 
-![Nginx with SSL:](./ash-web/images/using_nginx_with_SSL.jpg)
+![Nginx with SSL:]![alt text](<Screenshot 2026-03-02 at 6.17.57 AM.png>)
+
+## Keep App Running After Reboot (Systemd)
+
+Create a systemd service so gunicorn starts automatically on reboot:
+```bash
+sudo nano /etc/systemd/system/portfolio.service
+```
+
+Add:
+```ini
+[Unit]
+Description=Gunicorn for Portfolio
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/portfolio
+ExecStart=/home/ubuntu/portfolio/.venv/bin/gunicorn -w 4 -b 127.0.0.1:8000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+```bash
+sudo systemctl enable portfolio
+sudo systemctl start portfolio
+sudo systemctl status portfolio
+```
+
+## Project Complete
+
+| Component | Status |
+|---|---|
+| Flask app | Done |
+| Gunicorn (production server) | Done |
+| Nginx (reverse proxy) | Done |
+| SSL via Let's Encrypt | Done |
+| Domain `umarfkporfolio.website` | Done |
+| AWS EC2 Ubuntu | Done |
+| Auto-start on reboot | Done |
+
+Live at: `https://umarfkporfolio.website`
